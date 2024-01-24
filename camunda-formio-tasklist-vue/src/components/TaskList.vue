@@ -630,8 +630,12 @@ export default class Tasklist extends Mixins(TaskListMixin) {
     SocketIOService.connect(
       this.webSocketEncryptkey,
       (refreshedTaskId: string, eventName: string, error: string) => {
+        console.log("Name of event:", eventName);
+        console.log("Refreshed Task ID:", refreshedTaskId);
+        
         // this.taskIdWebsocket = refreshedTaskId;
         if (error) {
+          console.log("WebSocket Error:", error);
           this.toastMsgTxt = `WebSocket is not connected which will cause
             some inconsistency. System is trying to reconnect,
             if you see this message for more than 10sec,
@@ -640,6 +644,7 @@ export default class Tasklist extends Mixins(TaskListMixin) {
         }
 
         if (eventName === "complete") {
+          console.log("isEventComplete?:", eventName);
           this.fetchPaginatedTaskList(
             this.selectedfilterId,
             this.payload,
@@ -649,7 +654,15 @@ export default class Tasklist extends Mixins(TaskListMixin) {
           );
 
           if (this.getFormsFlowTaskId && refreshedTaskId === this.getFormsFlowTaskId) {
+            // Log values to the console
+            console.log("getFormsFlowTaskId:", this.getFormsFlowTaskId);
+            console.log("refreshedTaskId:", refreshedTaskId);
+            console.log("setFormsFlowTaskId before:", this.setFormsFlowTaskId);
+
             this.setFormsFlowTaskId("");
+
+            // Log the value of setFormsFlowTaskId after modification
+            console.log("setFormsFlowTaskId after:", this.setFormsFlowTaskId);
           }
         }
         else {
@@ -657,15 +670,34 @@ export default class Tasklist extends Mixins(TaskListMixin) {
             /* in case of update event update TaskList if the updated taskId is in
             the current paginated taskList for the user only refresh */
             if (eventName === "update") {
+              console.log("isUpdateEvent?:", eventName);
+              console.log("selectedfilterId:", this.selectedfilterId);
+              
+
               if (getTaskFromList(this.tasks, refreshedTaskId)) {
+                console.log("Current Task:", this.tasks)
+                console.log("refreshedTaskId:", refreshedTaskId);
+
                 this.reloadLHSTaskList();
               }
             }
 
             // In case of a new task is being created
             else if (eventName === "create") {
+              console.log("isCreateEvent?:", eventName);
+
+              // Log additional parameters or variables if needed
+              // For example, if there are other variables like this.reloadLHSTaskList()
+              console.log("reloadLHSTaskList before:", /* value before invocation */);
+              
               this.reloadLHSTaskList();
+              // Log additional parameters or variables if needed after invocation
+              console.log("reloadLHSTaskList after:", /* value after invocation */);
+
               this.$root.$emit("call-pagination");
+
+              // Log additional parameters or variables if needed
+              console.log("$root emitted call-pagination");
             }
             else {
               this.reloadLHSTaskList();
@@ -673,12 +705,20 @@ export default class Tasklist extends Mixins(TaskListMixin) {
           }
 
           if (this.getFormsFlowTaskId && refreshedTaskId === this.getFormsFlowTaskId) {
+            // Log values to the console
+            console.log("getFormsFlowTaskId:", this.getFormsFlowTaskId);
+            console.log("refreshedTaskId:", refreshedTaskId);
+            console.log("this.task.assignee:", this.task.assignee);
+            console.log("this.userName:", this.userName);
+
             //condition to remove the form input when a user is typing in the form by task refresh
             if (this.task.assignee === this.userName) {
+              console.log("Reloading BPM Task Detail for assigned task");
               this.getBPMTaskDetail(this.task.id!);
             }
             // If task is not being claimed, then reload the full task details
             else {
+              console.log("Fetching task details for unassigned task");
               this.fetchTaskDetails(this.getFormsFlowTaskId);
             }
           }
@@ -690,20 +730,41 @@ export default class Tasklist extends Mixins(TaskListMixin) {
     // is always constant,so after calling the required task details from router to use other
     // tasks in list we need to set taskId2 value as ''
     if (this.taskId2 !== this.taskIdValue) {
+      // Log values to the console before modification
+      console.log("Before modification - taskId2:", this.taskId2);
+      console.log("Before modification - taskIdValue:", this.taskIdValue);
+
       this.taskId2 = this.taskIdValue;
+
+      // Log values to the console after modification
+      console.log("After modification - taskId2:", this.taskId2);
+
     } else {
       this.taskId2 = "";
     }
+
     if (this.taskId2 !== "") {
+      // Log values to the console before async operations
+      console.log("Before async operations - selectedfilterId:", this.selectedfilterId);
+      console.log("Before async operations - payload:", this.payload);
+      console.log("Before async operations - taskId2:", this.taskId2);
+      console.log("Before async operations - fulltasks:", this.fulltasks);
+
       await this.fetchFullTaskList(this.selectedfilterId, this.payload);
       await this.findTaskIdDetailsFromURLrouter(this.taskId2, this.fulltasks);
       await this.fetchTaskDetails(this.taskId2);
+
+      // Log values to the console after async operations
+      console.log("After async operations - selectedfilterId:", this.selectedfilterId);
+      console.log("After async operations - payload:", this.payload);
+      console.log("After async operations - taskId2:", this.taskId2);
+      console.log("After async operations - fulltasks:", this.fulltasks);
+
       this.taskId2 = "";
     }
 
   }
 
- 
 
   beforeDestroy() {
     SocketIOService.disconnect();
