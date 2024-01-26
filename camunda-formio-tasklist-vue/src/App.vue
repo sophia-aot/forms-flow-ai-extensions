@@ -4,6 +4,14 @@
   </div>
 </template>
 
+<script>
+export default {
+  mounted() {
+    console.log('Component has been mounted!');
+  }
+}
+</script>
+
 <style lang="scss">
 #app {
   // font-family: inherit !important;

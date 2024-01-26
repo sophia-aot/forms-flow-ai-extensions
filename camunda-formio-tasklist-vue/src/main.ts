@@ -8,6 +8,7 @@ import store from "./store/index";
 
 Vue.config.productionTip = false;
 
+console.log("Initializing Vue App...");
 
 new Vue({
   router,

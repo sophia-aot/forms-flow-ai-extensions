@@ -21,5 +21,8 @@ vueComponents.keys().forEach((filename) => {
   // Get PascalCase name of component
   const componentName = filename.replace(/^\.\//, '').replace(/\.\w+$/, '');
 
+  // Log the component name to the console
+  console.log('Registering component:', componentName);
+
   Vue.component(componentName, componentConfig.default || componentConfig);
 });
